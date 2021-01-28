@@ -20,6 +20,7 @@ namespace ScpMessages
         readonly TwoTupleSOList AttackerDamage = new TwoTupleSOList();
         readonly TwoTupleSOList TargetDamage = new TwoTupleSOList();
         readonly TwoTupleSOList TargetHitboxDamage = new TwoTupleSOList();
+        readonly TwoTupleSOList AttackerHitboxDamage = new TwoTupleSOList();
         readonly TwoTupleSOList Target = new TwoTupleSOList();
         readonly TwoTupleSOList Damage = new TwoTupleSOList();
         readonly TwoTupleSOList Artificial = new TwoTupleSOList();
@@ -34,6 +35,9 @@ namespace ScpMessages
 
         DoorLockMode mode;
 
+        ItemCategory ItemCat;
+
+        bool ItemInHandIsKeycard;
 
         public EventHandlers(ScpMessages Plugin)
         {
@@ -75,7 +79,7 @@ namespace ScpMessages
 
         public void OnDoorInteract(InteractingDoorEventArgs Door)
         {
-            if (!Plugin.Config.DoorMessageEnabled || !Door.Door.TryGetComponent(out DoorNametagExtension _) || 
+            if (!Plugin.Config.DoorMessageEnabled || !Door.Door.TryGetComponent(out DoorNametagExtension _) ||
                 (Door.Player.IsHuman && !Plugin.Config.HumansReceiveMessage) || Door.Player.IsScp)
                 return;
 
@@ -83,7 +87,7 @@ namespace ScpMessages
             if (Chance > Plugin.Config.DoorMessageChance)
                 return;
 
-            bool ItemInHandIsKeycard = ItemInHandIsKeycardForPlayer(Door.Player);
+            ItemInHandIsKeycard = ItemInHandIsKeycardForPlayer(Door.Player);
             if (Door.Player.IsBypassModeEnabled)
             {
                 if (ItemInHandIsKeycard)
@@ -174,8 +178,7 @@ namespace ScpMessages
                 }
                 else if (Hurt.DamageType.isWeapon)
                 {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerDamage);
-                    ShowHintDisplay(Hurt.Target, Message);
+
                 }
                 else if (Hurt.DamageType == DamageTypes.Tesla)
                 {
@@ -239,12 +242,17 @@ namespace ScpMessages
             if (Shot.Target == null)
                 return;
 
+            Player Target = new Player(Shot.Target);
             DamageData.Item2 = Math.Round(Shot.Damage);
-            PlayerTargetData.Item2 = new Player(Shot.Target).Nickname;
+            PlayerTargetData.Item2 = Target.Nickname;
+            PlayerAttackerData.Item2 = Shot.Shooter.Nickname;
             HitboxData.Item2 = Shot.HitboxTypeEnum.ToString().ToLowerInvariant();
             TargetHitboxDamage.AddTwoTupleSO(PlayerTargetData, HitboxData, DamageData);
+            AttackerHitboxDamage.AddTwoTupleSO(PlayerAttackerData, HitboxData, DamageData);
             string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGunAttackMessage, '%', TargetHitboxDamage);
+            string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerDamage);
             ShowHintDisplay(Shot.Shooter, Message);
+            ShowHintDisplay(Target, Message2);
         }
 
         public void ProcessScpDamageHint(HurtingEventArgs Hurt)
@@ -300,7 +308,7 @@ namespace ScpMessages
 
         public bool ItemInHandIsKeycardForPlayer(Player Ply)
         {
-            ItemCategory ItemCat = Ply.Inventory.GetItemByID(Ply.Inventory.curItem)?.itemCategory ?? ItemCategory.None;
+            ItemCat = Ply.Inventory.GetItemByID(Ply.Inventory.curItem)?.itemCategory ?? ItemCategory.None;
             return ItemCat == ItemCategory.Keycard;
         }
     }
