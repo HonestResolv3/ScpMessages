@@ -9,7 +9,7 @@ An SCP:SL Exiled plugin that plays messages with events that occur with the game
   
 - Events messages play for: 
   - Door interactions
-  - Damage dealth (through guns, grenades, teslas, etc.)
+  - Damage dealt (through guns, grenades, teslas, etc.)
   - Medical items used
   
 - Customizable Options:
