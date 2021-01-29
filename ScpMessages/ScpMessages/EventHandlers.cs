@@ -2,7 +2,10 @@
 using Exiled.Events.EventArgs;
 using Hints;
 using Interactables.Interobjects.DoorUtils;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ScpMessages
 {
@@ -33,6 +36,11 @@ namespace ScpMessages
 
         readonly ScpMessages Plugin;
 
+        readonly string AreaForFile = Path.Combine(Paths.Configs, "ScpMessages");
+        readonly string FileName;
+
+        Dictionary<string, bool> Players = new Dictionary<string, bool>();
+
         DoorLockMode mode;
 
         ItemCategory ItemCat;
@@ -42,6 +50,7 @@ namespace ScpMessages
         public EventHandlers(ScpMessages Plugin)
         {
             this.Plugin = Plugin;
+            FileName = Path.Combine(AreaForFile, "ScpMessages.txt");
         }
 
         public void OnDamage(HurtingEventArgs Hurt)
@@ -79,8 +88,9 @@ namespace ScpMessages
 
         public void OnDoorInteract(InteractingDoorEventArgs Door)
         {
-            if (!Plugin.Config.DoorMessageEnabled || !Door.Door.TryGetComponent(out DoorNametagExtension _) ||
-                (Door.Player.IsHuman && !Plugin.Config.HumansReceiveMessage) || Door.Player.IsScp)
+            if (!Plugin.Config.DoorMessageEnabled || !Door.Door.TryGetComponent(out DoorNametagExtension _) 
+                || (Door.Player.IsHuman && !Plugin.Config.HumansReceiveMessage) 
+                || Door.Player.IsScp)
                 return;
 
             int Chance = NumGen.Next(0, 100);
@@ -119,7 +129,7 @@ namespace ScpMessages
 
         public void OnMedicalItemUse(UsedMedicalItemEventArgs Med)
         {
-            if (!Plugin.Config.MedicalItemMessageEnabled || !Plugin.Config.HumansReceiveMessage)
+            if (!Plugin.Config.MedicalItemMessageEnabled || !Plugin.Config.HumansReceiveMessage || !CheckForDisplayToggle(Med.Player))
                 return;
 
             int Chance = NumGen.Next(0, 100);
@@ -159,6 +169,68 @@ namespace ScpMessages
             }
         }
 
+        public void OnConsoleCommandSent(SendingConsoleCommandEventArgs Con)
+        {
+            if (Con.Name.ToLowerInvariant().Contains("scpmsg"))
+            {
+                Con.IsAllowed = false;
+                if (Players.ContainsKey(Con.Player.UserId) && Players.TryGetValue(Con.Player.UserId, out bool value))
+                    Players[Con.Player.UserId] = !value;
+                else
+                    Players.Add(Con.Player.UserId, false);
+
+                if (Players[Con.Player.UserId])
+                    Con.ReturnMessage = "Hint messages related to ScpMessages are now enabled for you";
+                else
+                    Con.ReturnMessage = "Hint messages related to ScpMessages are now disabled for you";
+            }
+        }
+
+        public void OnPlayerJoin(JoinedEventArgs Join)
+        {
+            if (CheckForDisplayToggle(Join.Player))
+                Map.Broadcast(15, "ScpMessages is on for you, you will see messages at the bottom when you do certain actions\nTo disable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+            else
+                Map.Broadcast(15, "ScpMessages is off for you, you will not see messages at the bottom when you do certain actions\nTo enable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+        }
+
+        public void OnServerStart()
+        {
+            if (!Directory.Exists(AreaForFile))
+                Directory.CreateDirectory(AreaForFile);
+            if (!File.Exists(FileName))
+                File.Create(FileName);
+
+            try
+            {
+                string Text = File.ReadAllText(FileName);
+                if (!string.IsNullOrWhiteSpace(Text))
+                    Players = JsonConvert.DeserializeObject<Dictionary<string, bool>>(Text);
+            }
+            catch (Exception)
+            {
+                Players = new Dictionary<string, bool>();
+            }
+        }
+
+        public void OnServerEnd()
+        {
+            if (!File.Exists(FileName))
+                File.Create(FileName);
+            else
+            {
+                try
+                {
+                    string JsonObject = JsonConvert.SerializeObject(Players, Formatting.Indented);
+                    File.WriteAllText(FileName, JsonObject);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
+
         public void ProcessDamageHint(HurtingEventArgs Hurt)
         {
             DamageData.Item2 = Math.Round(Hurt.Amount);
@@ -169,71 +241,60 @@ namespace ScpMessages
             AttackerDamage.AddTwoTupleSO(PlayerAttackerData, DamageData);
             TargetDamage.AddTwoTupleSO(PlayerTargetData, DamageData);
 
-            try
+            if (Hurt.DamageType == DamageTypes.Falldown)
             {
-                if (Hurt.DamageType == DamageTypes.Falldown)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.FallDamageMessage, '%', Damage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType.isWeapon)
-                {
-
-                }
-                else if (Hurt.DamageType == DamageTypes.Tesla)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.TeslaDamageMessage, '%', Damage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Grenade)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.GrenadeDamageMessage, '%', AttackerDamage);
-                    string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGrenadeAttackMessage, '%', TargetDamage);
-                    ShowHintDisplay(Hurt.Attacker, Message2);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.MicroHid)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.MicroHidDamageMessage, '%', AttackerDamage);
-                    string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanMicroHidAttackMessage, '%', TargetDamage);
-                    ShowHintDisplay(Hurt.Attacker, Message2);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp049)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049DamageMessage, '%', Damage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp0492)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp0492DamageMessage, '%', AttackerDamage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp096)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096DamageMessage, '%', Damage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp106)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp106DamageMessage, '%', AttackerDamage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp173)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173DamageMessage, '%', Damage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
-                else if (Hurt.DamageType == DamageTypes.Scp939)
-                {
-                    string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp939DamageMessage, '%', AttackerDamage);
-                    ShowHintDisplay(Hurt.Target, Message);
-                }
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.FallDamageMessage, '%', Damage);
+                ShowHintDisplay(Hurt.Target, Message);
             }
-            catch (Exception)
+
+            else if (Hurt.DamageType == DamageTypes.Tesla)
             {
-                // When you show a new hint to an NPC, it ends up being a NullReferenceException
-                // Though, their HintDisplay property is not null. It occurs with the .Show() method
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.TeslaDamageMessage, '%', Damage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Grenade)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.GrenadeDamageMessage, '%', AttackerDamage);
+                string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGrenadeAttackMessage, '%', TargetDamage);
+                ShowHintDisplay(Hurt.Attacker, Message2);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.MicroHid)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.MicroHidDamageMessage, '%', AttackerDamage);
+                string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanMicroHidAttackMessage, '%', TargetDamage);
+                ShowHintDisplay(Hurt.Attacker, Message2);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp049)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049DamageMessage, '%', Damage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp0492)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp0492DamageMessage, '%', AttackerDamage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp096)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096DamageMessage, '%', Damage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp106)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp106DamageMessage, '%', AttackerDamage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp173)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173DamageMessage, '%', Damage);
+                ShowHintDisplay(Hurt.Target, Message);
+            }
+            else if (Hurt.DamageType == DamageTypes.Scp939)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp939DamageMessage, '%', AttackerDamage);
+                ShowHintDisplay(Hurt.Target, Message);
             }
         }
 
@@ -299,10 +360,11 @@ namespace ScpMessages
 
         public void ShowHintDisplay(Player Ply, string Message)
         {
-            if (Ply.HintDisplay == null)
+            if (Ply.HintDisplay == null || !CheckForDisplayToggle(Ply))
                 return;
 
             Hint.Text = "\n\n\n\n\n\n\n\n" + Message;
+
             Ply.HintDisplay.Show(Hint);
         }
 
@@ -310,6 +372,20 @@ namespace ScpMessages
         {
             ItemCat = Ply.Inventory.GetItemByID(Ply.Inventory.curItem)?.itemCategory ?? ItemCategory.None;
             return ItemCat == ItemCategory.Keycard;
+        }
+
+        public bool CheckForDisplayToggle(Player Ply)
+        {
+            try
+            {
+                if (!Players.TryGetValue(Ply.UserId, out bool value))
+                    return false;
+                return value;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

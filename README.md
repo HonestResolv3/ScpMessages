@@ -5,7 +5,7 @@ An SCP:SL Exiled plugin that plays messages with events that occur with the game
 ```
 - Messages play for: 
   - Humans
-  - SCPs
+  - SCPs (Damage only)
   
 - Events messages play for: 
   - Door interactions
@@ -16,6 +16,24 @@ An SCP:SL Exiled plugin that plays messages with events that occur with the game
   - Message playing chances
   - Messages themselves (Enabled/Disabled, Text shown, etc.)
   - Who receives messages
+
+- Convenience:
+  - Users can choose if they want the messages to be played
+  - The choice users make stay in following rounds
+```
+
+### Console (Not Remote Admin) Command
+```
+- .scpmsg | Enables/Disables messages from being shown
+```
+
+### Notes For General Use
+```
+The text file where player User ID's are stored for remembering their message choice is located where your servers Configs folder is (I.e.: 7777-config.yml)
+
+Please do not try to modify the formatting and/or content of the file or else the game will not be able to read the information properly
+
+Also please add the provided Newtonsoft.Json.dll file into your servers Dependencies folder for this to properly work (If it is not there)
 ```
 
 ### Notes For Message Use
@@ -29,7 +47,7 @@ An SCP:SL Exiled plugin that plays messages with events that occur with the game
   - How much damage you dealt in attack_message variables
 
 - %hitbox
-  - The hitbox name of the area you shot in the human_gun_attack_message variable
+  - The hitbox name of the area you shot in the human_gun_attack_message and bullet_damage_message variable
   
 - %health
   - HP you gained in heal_message variables
@@ -51,7 +69,7 @@ scp_messages:
   door_message_chance: 100
   medical_item_message_chance: 100
   fall_damage_message: You fell down and took %damage damage
-  bullet_damage_message: You got shot by %player and took %damage damage
+  bullet_damage_message: You got shot by %player in the %hitbox and took %damage damage
   tesla_damage_message: You got zapped by a tesla and took %damage damage
   grenade_damage_message: You got hit by %player's frag grenade and took %damage damage
   micro_hid_damage_message: You got zapped by %player and took %damage

@@ -23,10 +23,18 @@ namespace ScpMessages
             Exiled.Events.Handlers.Player.Shot += EventHandler.OnShoot;
             Exiled.Events.Handlers.Player.MedicalItemUsed += EventHandler.OnMedicalItemUse;
             Exiled.Events.Handlers.Player.InteractingDoor += EventHandler.OnDoorInteract;
+            Exiled.Events.Handlers.Server.SendingConsoleCommand += EventHandler.OnConsoleCommandSent;
+            Exiled.Events.Handlers.Server.RestartingRound += EventHandler.OnServerEnd;
+            Exiled.Events.Handlers.Player.Joined += EventHandler.OnPlayerJoin;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandler.OnServerStart;
         }
 
         public override void OnDisabled()
         {
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandler.OnServerStart;
+            Exiled.Events.Handlers.Player.Joined -= EventHandler.OnPlayerJoin;
+            Exiled.Events.Handlers.Server.RestartingRound -= EventHandler.OnServerEnd;
+            Exiled.Events.Handlers.Server.SendingConsoleCommand -= EventHandler.OnConsoleCommandSent;
             Exiled.Events.Handlers.Player.InteractingDoor -= EventHandler.OnDoorInteract;
             Exiled.Events.Handlers.Player.MedicalItemUsed -= EventHandler.OnMedicalItemUse;
             Exiled.Events.Handlers.Player.Shot -= EventHandler.OnShoot;

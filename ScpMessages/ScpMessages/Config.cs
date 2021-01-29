@@ -15,7 +15,7 @@ namespace ScpMessages
         public uint DoorMessageChance { get; set; } = 100;
         public uint MedicalItemMessageChance { get; set; } = 100;
         public string FallDamageMessage { get; set; } = "You fell down and took %damage damage";
-        public string BulletDamageMessage { get; set; } = "You got shot by %player and took %damage damage";
+        public string BulletDamageMessage { get; set; } = "You got shot by %player in the %hitbox and took %damage damage";
         public string TeslaDamageMessage { get; set; } = "You got zapped by a tesla and took %damage damage";
         public string GrenadeDamageMessage { get; set; } = "You got hit by %player's frag grenade and took %damage damage";
         public string MicroHidDamageMessage { get; set; } = "You got zapped by %player and took %damage";
