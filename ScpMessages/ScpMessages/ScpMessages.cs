@@ -25,14 +25,15 @@ namespace ScpMessages
             Exiled.Events.Handlers.Player.InteractingDoor += EventHandler.OnDoorInteract;
             Exiled.Events.Handlers.Server.SendingConsoleCommand += EventHandler.OnConsoleCommandSent;
             Exiled.Events.Handlers.Server.RestartingRound += EventHandler.OnServerEnd;
-            Exiled.Events.Handlers.Player.Joined += EventHandler.OnPlayerJoin;
+            Exiled.Events.Handlers.Player.Verified += EventHandler.OnPlayerJoin;
             Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandler.OnServerStart;
+            Log.Info("Loaded ScpMessages");
         }
 
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandler.OnServerStart;
-            Exiled.Events.Handlers.Player.Joined -= EventHandler.OnPlayerJoin;
+            Exiled.Events.Handlers.Player.Verified -= EventHandler.OnPlayerJoin;
             Exiled.Events.Handlers.Server.RestartingRound -= EventHandler.OnServerEnd;
             Exiled.Events.Handlers.Server.SendingConsoleCommand -= EventHandler.OnConsoleCommandSent;
             Exiled.Events.Handlers.Player.InteractingDoor -= EventHandler.OnDoorInteract;
@@ -41,6 +42,7 @@ namespace ScpMessages
             Exiled.Events.Handlers.Player.Hurting -= EventHandler.OnDamage;
 
             EventHandler = null;
+            Log.Info("Un-Loaded ScpMessages");
         }
     }
 }

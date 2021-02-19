@@ -88,14 +88,18 @@ namespace ScpMessages
 
         public void OnDoorInteract(InteractingDoorEventArgs Door)
         {
-            if (!Plugin.Config.DoorMessageEnabled || !Door.Door.TryGetComponent(out DoorNametagExtension _) 
+            int Chance = NumGen.Next(0, 100);
+            if (!Plugin.Config.DoorMessageEnabled || (Chance > Plugin.Config.DoorMessageChance) || !Door.Door.TryGetComponent(out DoorNametagExtension _) 
                 || (Door.Player.IsHuman && !Plugin.Config.HumansReceiveMessage) 
                 || Door.Player.IsScp)
                 return;
 
-            int Chance = NumGen.Next(0, 100);
-            if (Chance > Plugin.Config.DoorMessageChance)
+            mode = DoorLockUtils.GetMode((DoorLockReason)Door.Door.ActiveLocks);
+            if (mode == DoorLockMode.FullLock)
+            {
+                ShowHintDisplay(Door.Player, Plugin.Config.FullLockdownMessage);
                 return;
+            }
 
             ItemInHandIsKeycard = ItemInHandIsKeycardForPlayer(Door.Player);
             if (Door.Player.IsBypassModeEnabled)
@@ -104,13 +108,6 @@ namespace ScpMessages
                     ShowHintDisplay(Door.Player, Plugin.Config.BypassDoorKeycardMessage);
                 else
                     ShowHintDisplay(Door.Player, Plugin.Config.BypassDoorMessage);
-                return;
-            }
-
-            mode = DoorLockUtils.GetMode((DoorLockReason)Door.Door.ActiveLocks);
-            if (mode == DoorLockMode.FullLock)
-            {
-                ShowHintDisplay(Door.Player, Plugin.Config.FullLockdownMessage);
                 return;
             }
 
@@ -177,7 +174,7 @@ namespace ScpMessages
                 if (Players.ContainsKey(Con.Player.UserId) && Players.TryGetValue(Con.Player.UserId, out bool value))
                     Players[Con.Player.UserId] = !value;
                 else
-                    Players.Add(Con.Player.UserId, false);
+                    Players.Add(Con.Player.UserId, true);
 
                 if (Players[Con.Player.UserId])
                     Con.ReturnMessage = "Hint messages related to ScpMessages are now enabled for you";
@@ -186,12 +183,12 @@ namespace ScpMessages
             }
         }
 
-        public void OnPlayerJoin(JoinedEventArgs Join)
+        public void OnPlayerJoin(VerifiedEventArgs Ver)
         {
-            if (CheckForDisplayToggle(Join.Player))
-                Map.Broadcast(15, "ScpMessages is on for you, you will see messages at the bottom when you do certain actions\nTo disable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+            if (CheckForDisplayToggle(Ver.Player))
+                Ver.Player.Broadcast(15, "ScpMessages is on for you, you will see messages at the bottom when you do certain actions\nTo disable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
             else
-                Map.Broadcast(15, "ScpMessages is off for you, you will not see messages at the bottom when you do certain actions\nTo enable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+                Ver.Player.Broadcast(15, "ScpMessages is off for you, you will not see messages at the bottom when you do certain actions\nTo enable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
         }
 
         public void OnServerStart()
