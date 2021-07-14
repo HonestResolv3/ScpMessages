@@ -63,19 +63,13 @@ namespace ScpMessages
                 return;
 
             if (Hurt.Target.IsHuman && Plugin.Config.HumansReceiveMessage)
-            {
                 ProcessDamageHint(Hurt);
-            }
 
             else if (Hurt.Target.IsScp && Plugin.Config.ScpsReceiveMessage)
-            {
                 ProcessDamageHint(Hurt);
-            }
 
             if (Hurt.Attacker.IsScp && Plugin.Config.ScpsReceiveMessage)
-            {
                 ProcessScpDamageHint(Hurt);
-            }
         }
 
         public void OnShoot(ShotEventArgs Shoot)
@@ -119,9 +113,7 @@ namespace ScpMessages
                     ShowHintDisplay(Door.Player, Plugin.Config.LockedDoorKeycardMessage);
             }
             else
-            {
                 ShowHintDisplay(Door.Player, Plugin.Config.UnlockedDoorKeycardMessage);
-            }
         }
 
         public void OnMedicalItemUse(UsedMedicalItemEventArgs Med)

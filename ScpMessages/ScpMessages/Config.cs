@@ -6,6 +6,7 @@ namespace ScpMessages
     public class Config : IConfig
     {
         public bool IsEnabled { get; set; } = true;
+        public bool EnableDebugStartupMessage { get; set; } = true;
         public bool DamageMessageEnabled { get; set; } = true;
         public bool DoorMessageEnabled { get; set; } = true;
         public bool MedicalItemMessageEnabled { get; set; } = true;

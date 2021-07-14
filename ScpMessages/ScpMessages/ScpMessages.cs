@@ -1,4 +1,5 @@
 ﻿using Exiled.API.Features;
+using System;
 
 namespace ScpMessages
 {
@@ -7,7 +8,9 @@ namespace ScpMessages
         public static ScpMessages ConfigRef { get; private set; }
         public EventHandlers EventHandler { get; private set; }
         public override string Name => "ScpMessages";
-        public override string Author => "TruthfullyHonest";
+        public override string Author => "HonestResolv3";
+        public override Version Version => new Version(1, 2, 0, 3);
+        public override Version RequiredExiledVersion => new Version(2, 10, 0);
 
         public ScpMessages()
         {
@@ -27,7 +30,8 @@ namespace ScpMessages
             Exiled.Events.Handlers.Server.RestartingRound += EventHandler.OnServerEnd;
             Exiled.Events.Handlers.Player.Verified += EventHandler.OnPlayerJoin;
             Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandler.OnServerStart;
-            Log.Info("Loaded ScpMessages");
+            if (ConfigRef.Config.EnableDebugStartupMessage)
+                Log.Info("Loaded ScpMessages");
         }
 
         public override void OnDisabled()
@@ -42,7 +46,8 @@ namespace ScpMessages
             Exiled.Events.Handlers.Player.Hurting -= EventHandler.OnDamage;
 
             EventHandler = null;
-            Log.Info("Un-Loaded ScpMessages");
+            if (ConfigRef.Config.EnableDebugStartupMessage)
+                Log.Info("Un-Loaded ScpMessages");
         }
     }
 }
