@@ -28,7 +28,15 @@ namespace ScpMessages
         public string Scp096AttackMessage { get; set; } = "You ripped %player apart with your hands killing them instantly";
         public string Scp106AttackMessage { get; set; } = "You brought %player to your pocket dimension also dealing %damage damage";
         public string Scp173AttackMessage { get; set; } = "You snapped %player killing them instantly";
-        public string Scp939AttackMessage { get; set; } = "You bit %player which wounded them dealing %damage damage";
+        public string Scp93953AttackMessage { get; set; } = "You bit %player which wounded them dealing %damage damage";
+        public string Scp93989AttackMessage { get; set; } = "You bit %player which wounded them dealing %damage damage";
+        public string Scp049AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp0492AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp096AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp106AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp173AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp93953AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
+        public string Scp93989AttackedMessage { get; set; } = "You were hit by %player and took %damage damage";
         public string Scp049DamageMessage { get; set; } = "You got tapped by %player and died instantly";
         public string Scp0492DamageMessage { get; set; } = "You got attacked by %player and took %damage damage";
         public string Scp096DamageMessage { get; set; } = "You got ripped apart by %player and died instantly";

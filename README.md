@@ -2,7 +2,6 @@
 An SCP:SL Exiled plugin that plays messages with events that occur with the game
 
 ### Features
-```
 - Messages play for: 
   - Humans
   - SCPs (Damage only)
@@ -20,7 +19,9 @@ An SCP:SL Exiled plugin that plays messages with events that occur with the game
 - Convenience:
   - Users can choose if they want the messages to be played
   - The choice users make stay in following rounds
-```
+
+### Credits
+- [RogerFK](https://github.com/RogerFK) (Code for replacing tokens (%player, etc) with other values)
 
 ### Console (Not Remote Admin) Command
 ```
