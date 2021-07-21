@@ -177,10 +177,13 @@ namespace ScpMessages
 
         public void OnPlayerJoin(VerifiedEventArgs Ver)
         {
-            if (CheckForDisplayToggle(Ver.Player))
-                Ver.Player.Broadcast(15, "ScpMessages is on for you, you will see messages at the bottom when you do certain actions\nTo disable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
-            else
-                Ver.Player.Broadcast(15, "ScpMessages is off for you, you will not see messages at the bottom when you do certain actions\nTo enable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+            if (Plugin.Config.EnableToggleMessageOnJoin)
+            {
+                if (CheckForDisplayToggle(Ver.Player))
+                    Ver.Player.Broadcast(15, "ScpMessages is on for you, you will see messages at the bottom when you do certain actions\nTo disable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+                else
+                    Ver.Player.Broadcast(15, "ScpMessages is off for you, you will not see messages at the bottom when you do certain actions\nTo enable, do <color=orange>.scpmsg</color> in your console (tilde (~) key)");
+            }
         }
 
         public void OnServerStart()
@@ -227,8 +230,8 @@ namespace ScpMessages
                 return;
 
             DamageData.Item2 = Math.Round(Hurt.Amount);
-            PlayerAttackerData.Item2 = Hurt.Attacker;
-            PlayerTargetData.Item2 = Hurt.Target;
+            PlayerAttackerData.Item2 = Hurt.Attacker.Nickname;
+            PlayerTargetData.Item2 = Hurt.Attacker.Nickname;
 
             Damage.AddTwoTupleSO(DamageData);
             AttackerDamage.AddTwoTupleSO(PlayerAttackerData, DamageData);
@@ -305,7 +308,7 @@ namespace ScpMessages
             TargetHitboxDamage.AddTwoTupleSO(PlayerTargetData, HitboxData, DamageData);
             AttackerHitboxDamage.AddTwoTupleSO(PlayerAttackerData, HitboxData, DamageData);
             string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGunAttackMessage, '%', TargetHitboxDamage);
-            string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerDamage);
+            string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerHitboxDamage);
             ShowHintDisplay(Shot.Shooter, Message);
             ShowHintDisplay(Target, Message2);
         }

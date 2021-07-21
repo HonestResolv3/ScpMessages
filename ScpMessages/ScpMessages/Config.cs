@@ -7,11 +7,12 @@ namespace ScpMessages
     {
         public bool IsEnabled { get; set; } = true;
         public bool EnableDebugStartupMessage { get; set; } = true;
-        public bool DamageMessageEnabled { get; set; } = true;
-        public bool DoorMessageEnabled { get; set; } = true;
-        public bool MedicalItemMessageEnabled { get; set; } = true;
-        public bool HumansReceiveMessage { get; set; } = true;
-        public bool ScpsReceiveMessage { get; set; } = true;
+        public bool EnableToggleMessageOnJoin { get; set; } = false;
+        public bool DamageMessageEnabled { get; set; } = false;
+        public bool DoorMessageEnabled { get; set; } = false;
+        public bool MedicalItemMessageEnabled { get; set; } = false;
+        public bool HumansReceiveMessage { get; set; } = false;
+        public bool ScpsReceiveMessage { get; set; } = false;
         public uint DamageMessageChance { get; set; } = 100;
         public uint DoorMessageChance { get; set; } = 100;
         public uint MedicalItemMessageChance { get; set; } = 100;
