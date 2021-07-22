@@ -20,10 +20,11 @@ namespace ScpMessages
         public string BulletDamageMessage { get; set; } = "You got shot by %player in the %hitbox and took %damage damage";
         public string TeslaDamageMessage { get; set; } = "You got zapped by a tesla and took %damage damage";
         public string GrenadeDamageMessage { get; set; } = "You got hit by %player's frag grenade and took %damage damage";
-        public string MicroHidDamageMessage { get; set; } = "You got zapped by %player and took %damage";
+        public string MicroHidDamageMessage { get; set; } = "You got zapped by %player and took %damage damage";
         public string HumanGunAttackMessage { get; set; } = "You shot %player in the %hitbox and dealt %damage damage";
+        public string HumanGunAttackScpMessage { get; set; } = "You shot %player and dealt %damage damage";
         public string HumanGrenadeAttackMessage { get; set; } = "You hit %player with a frag grenade and dealt %damage damage";
-        public string HumanMicroHidAttackMessage { get; set; } = "You zapped %player dealing %damage";
+        public string HumanMicroHidAttackMessage { get; set; } = "You zapped %player dealing %damage damage";
         public string Scp049AttackMessage { get; set; } = "You tapped %player killing them instantly, revive them as a zombie!";
         public string Scp0492AttackMessage { get; set; } = "You attacked %player dealing %damage damage";
         public string Scp096AttackMessage { get; set; } = "You ripped %player apart with your hands killing them instantly";

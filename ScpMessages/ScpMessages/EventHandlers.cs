@@ -77,7 +77,7 @@ namespace ScpMessages
             if (!Plugin.Config.DamageMessageEnabled || !Plugin.Config.HumansReceiveMessage)
                 return;
 
-            ProcessHumanShotHint(Shoot);
+            ProcessShotHit(Shoot);
         }
 
         public void OnDoorInteract(InteractingDoorEventArgs Door)
@@ -264,7 +264,7 @@ namespace ScpMessages
             }
             else if (Hurt.DamageType == DamageTypes.Scp049)
             {
-                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049DamageMessage, '%', Damage);
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049DamageMessage, '%', AttackerDamage);
                 ShowHintDisplay(Hurt.Target, Message);
             }
             else if (Hurt.DamageType == DamageTypes.Scp0492)
@@ -274,7 +274,7 @@ namespace ScpMessages
             }
             else if (Hurt.DamageType == DamageTypes.Scp096)
             {
-                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096DamageMessage, '%', Damage);
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096DamageMessage, '%', AttackerDamage);
                 ShowHintDisplay(Hurt.Target, Message);
             }
             else if (Hurt.DamageType == DamageTypes.Scp106)
@@ -284,7 +284,7 @@ namespace ScpMessages
             }
             else if (Hurt.DamageType == DamageTypes.Scp173)
             {
-                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173DamageMessage, '%', Damage);
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173DamageMessage, '%', AttackerDamage);
                 ShowHintDisplay(Hurt.Target, Message);
             }
             else if (Hurt.DamageType == DamageTypes.Scp939)
@@ -294,23 +294,71 @@ namespace ScpMessages
             }
         }
 
-        public void ProcessHumanShotHint(ShotEventArgs Shot)
+        public void ProcessShotHit(ShotEventArgs Shot)
         {
             int Chance = NumGen.Next(0, 100);
+            Player Target = new Player(Shot.Target);
             if (Chance > Plugin.Config.DamageMessageChance || Shot.Target == null)
                 return;
 
-            Player Target = new Player(Shot.Target);
             DamageData.Item2 = Math.Round(Shot.Damage);
             PlayerTargetData.Item2 = Target.Nickname;
             PlayerAttackerData.Item2 = Shot.Shooter.Nickname;
             HitboxData.Item2 = Shot.HitboxTypeEnum.ToString().ToLowerInvariant();
+            AttackerDamage.AddTwoTupleSO(PlayerTargetData, DamageData);
             TargetHitboxDamage.AddTwoTupleSO(PlayerTargetData, HitboxData, DamageData);
             AttackerHitboxDamage.AddTwoTupleSO(PlayerAttackerData, HitboxData, DamageData);
-            string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGunAttackMessage, '%', TargetHitboxDamage);
-            string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerHitboxDamage);
-            ShowHintDisplay(Shot.Shooter, Message);
-            ShowHintDisplay(Target, Message2);
+
+            if (Shot.Shooter.IsHuman && Target.IsScp)
+            {
+                string Message;
+                string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGunAttackScpMessage, '%', AttackerDamage);
+                switch (Target.Role)
+                {
+                    case RoleType.Scp049:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp0492:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp0492AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp096:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp106:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp106AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp173:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp93953:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp93953AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                    case RoleType.Scp93989:
+                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp93989AttackedMessage, '%', AttackerDamage);
+                        ShowHintDisplay(Target, Message);
+                        ShowHintDisplay(Shot.Shooter, Message2);
+                        break;
+                }
+            }
+            else if (Shot.Shooter.IsHuman && Target.IsHuman)
+            {
+                string Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.HumanGunAttackMessage, '%', TargetHitboxDamage);
+                string Message2 = TokenReplacer.ReplaceAfterToken(Plugin.Config.BulletDamageMessage, '%', AttackerHitboxDamage);
+                ShowHintDisplay(Shot.Shooter, Message);
+                ShowHintDisplay(Target, Message2);
+            }
         }
 
         public void ProcessScpDamageHint(HurtingEventArgs Hurt)
@@ -326,8 +374,6 @@ namespace ScpMessages
             Damage.AddTwoTupleSO(DamageData);
             TargetDamage.AddTwoTupleSO(PlayerTargetData, DamageData);
 
-            if (Hurt.Attacker.IsScp)
-            {
                 switch (Hurt.Attacker.Role)
                 {
                     case RoleType.Scp049:
@@ -359,41 +405,6 @@ namespace ScpMessages
                         ShowHintDisplay(Hurt.Attacker, Message);
                         break;
                 }
-            }
-            else
-            {
-                switch (Hurt.Target.Role)
-                {
-                    case RoleType.Scp049:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp049AttackedMessage, '%', Target);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp0492:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp0492AttackedMessage, '%', TargetDamage);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp096:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp096AttackedMessage, '%', Target);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp106:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp106AttackedMessage, '%', TargetDamage);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp173:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp173AttackedMessage, '%', Target);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp93953:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp93953AttackedMessage, '%', TargetDamage);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                    case RoleType.Scp93989:
-                        Message = TokenReplacer.ReplaceAfterToken(Plugin.Config.Scp93989AttackedMessage, '%', TargetDamage);
-                        ShowHintDisplay(Hurt.Target, Message);
-                        break;
-                }
-            }
         }
 
         public void ShowHintDisplay(Player Ply, string Message)
