@@ -304,7 +304,12 @@ namespace ScpMessages
             DamageData.Item2 = Math.Round(Shot.Damage);
             PlayerTargetData.Item2 = Target.Nickname;
             PlayerAttackerData.Item2 = Shot.Shooter.Nickname;
-            HitboxData.Item2 = Shot.HitboxTypeEnum.ToString().ToLowerInvariant();
+
+            if (Plugin.Config.HitboxTranslations.TryGetValue(Shot.HitboxTypeEnum.ToString().ToUpperInvariant(), out string Hitbox))
+                HitboxData.Item2 = Hitbox;
+            else
+                HitboxData.Item2 = Shot.HitboxTypeEnum.ToString().ToLowerInvariant();
+
             AttackerDamage.AddTwoTupleSO(PlayerTargetData, DamageData);
             TargetHitboxDamage.AddTwoTupleSO(PlayerTargetData, HitboxData, DamageData);
             AttackerHitboxDamage.AddTwoTupleSO(PlayerAttackerData, HitboxData, DamageData);

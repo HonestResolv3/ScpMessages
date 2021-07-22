@@ -18,6 +18,8 @@ This will be the last plugin I make for the SCP: Secret Laboratory plugin framew
   - Message playing chances
   - Messages themselves (Enabled/Disabled, Text shown, etc.)
   - Who receives messages
+  - Hitbox body part name translation
+  - Debug and Join message options
 
 - Convenience:
   - Users can choose if they want the messages to be played
@@ -43,8 +45,8 @@ Also please add the provided Newtonsoft.Json.dll file into your servers Dependen
 ### Notes For Message Use
 ```
 - %player
-  - Who attacked you in damage_message variables
-  - Who you attacked in attack_message variables
+  - Who attacked you in damage_message, attack_message_scp, (scp)_attacked_message variables
+  - Who you attacked in attack_message, attack_message_scp, (scp)_attacked_message variables
   
 - %damage
   - How much damage you took in damage_messge variables
@@ -64,6 +66,8 @@ Also please add the provided Newtonsoft.Json.dll file into your servers Dependen
 ```yaml
 scp_messages:
   is_enabled: true
+  enable_debug_startup_message: true
+  enable_toggle_message_on_join: true
   damage_message_enabled: true
   door_message_enabled: true
   medical_item_message_enabled: true
@@ -72,12 +76,18 @@ scp_messages:
   damage_message_chance: 100
   door_message_chance: 100
   medical_item_message_chance: 100
+  hitbox_translations:
+    HEAD: head
+    ARM: arm
+    BODY: body
+    LEG: leg
   fall_damage_message: You fell down and took %damage damage
   bullet_damage_message: You got shot by %player in the %hitbox and took %damage damage
   tesla_damage_message: You got zapped by a tesla and took %damage damage
   grenade_damage_message: You got hit by %player's frag grenade and took %damage damage
   micro_hid_damage_message: You got zapped by %player and took %damage
   human_gun_attack_message: You shot %player in the %hitbox and dealt %damage damage
+  human_gun_attack_scp_message: You shot %player and dealt %damage damage
   human_grenade_attack_message: You hit %player with a frag grenade and dealt %damage damage
   human_micro_hid_attack_message: You zapped %player dealing %damage
   scp049_attack_message: You tapped %player killing them instantly, revive them as a zombie!
@@ -85,7 +95,15 @@ scp_messages:
   scp096_attack_message: You ripped %player apart with your hands killing them instantly
   scp106_attack_message: You brought %player to your pocket dimension also dealing %damage damage
   scp173_attack_message: You snapped %player killing them instantly
-  scp939_attack_message: You bit %player which wounded them dealing %damage damage
+  scp93953_attack_message: You bit %player which wounded them dealing %damage damage
+  scp93989_attack_message: You bit %player which wounded them dealing %damage damage
+  scp049_attacked_message: You were hit by %player and took %damage damage
+  scp0492_attacked_message: You were hit by %player and took %damage damage
+  scp096_attacked_message: You were hit by %player and took %damage damage
+  scp106_attacked_message: You were hit by %player and took %damage damage
+  scp173_attacked_message: You were hit by %player and took %damage damage
+  scp93953_attacked_message: You were hit by %player and took %damage damage
+  scp93989_attacked_message: You were hit by %player and took %damage damage
   scp049_damage_message: You got tapped by %player and died instantly
   scp0492_damage_message: You got attacked by %player and took %damage damage
   scp096_damage_message: You got ripped apart by %player and died instantly
