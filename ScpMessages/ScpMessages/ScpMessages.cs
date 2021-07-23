@@ -9,7 +9,7 @@ namespace ScpMessages
         public EventHandlers EventHandler { get; private set; }
         public override string Name => "ScpMessages";
         public override string Author => "HonestResolv3";
-        public override Version Version => new Version(1, 5, 0, 0);
+        public override Version Version => new Version(1, 5, 1, 0);
         public override Version RequiredExiledVersion => new Version(2, 10, 0);
 
         public ScpMessages()
