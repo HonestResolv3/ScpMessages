@@ -8,6 +8,7 @@ namespace ScpMessages
         public bool IsEnabled { get; set; } = true;
         public bool EnableDebugStartupMessage { get; set; } = true;
         public bool EnableToggleMessageOnJoin { get; set; } = true;
+        public bool ForceMessagesEnabledOnJoin { get; set; } = true;
         public bool DamageMessageEnabled { get; set; } = true;
         public bool DoorMessageEnabled { get; set; } = true;
         public bool MedicalItemMessageEnabled { get; set; } = true;

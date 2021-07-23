@@ -177,6 +177,14 @@ namespace ScpMessages
 
         public void OnPlayerJoin(VerifiedEventArgs Ver)
         {
+            if (Plugin.Config.ForceMessagesEnabledOnJoin)
+            {
+                if (!Players.ContainsKey(Ver.Player.UserId))
+                    Players.Add(Ver.Player.UserId, true);
+                else
+                    Players[Ver.Player.UserId] = true;
+            }
+
             if (Plugin.Config.EnableToggleMessageOnJoin)
             {
                 if (CheckForDisplayToggle(Ver.Player))
