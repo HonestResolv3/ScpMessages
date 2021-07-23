@@ -68,6 +68,7 @@ scp_messages:
   is_enabled: true
   enable_debug_startup_message: true
   enable_toggle_message_on_join: true
+  force_messages_enabled_on_join: true
   damage_message_enabled: true
   door_message_enabled: true
   medical_item_message_enabled: true
