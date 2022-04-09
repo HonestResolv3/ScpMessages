@@ -2,7 +2,7 @@
 An SCP:SL Exiled plugin that plays messages with events that occur with the game
 
 # Notice
-This will be the last plugin I make for the SCP: Secret Laboratory plugin framework EXILED. If there are any issues I will try my best to maintain development, but other plugins I made in the past will not receive any support
+No more SCP: Secret Laboratory plugins will be created by me beyond this point, this project and all my other projects will be archived for reference only
 
 ### Features
 - Messages play for: 
